@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>회원가입</title>
-    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>상품 상세 페이지</title>
+    <title>회원가입</title>
     <link
       href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css"
       rel="stylesheet"
@@ -51,23 +49,49 @@
       .form_frame {
         margin-top: 50px;
       }
+
       #business_number_1,
       #business_number_2,
       #business_number_3 {
         width: 15%;
       }
+
       .buisiness {
         width: auto;
         padding-left: 15%;
       }
-      .bank_name {
-        display: inline;
-        width: 10%;
-      }
+
+      .bank_name,
       .account {
+        display: inline-block;
+        width: 48%; /* Adjust the width as needed */
+        margin-right: 4%; /* Adjust the margin as needed */
+      }
+
+      .bank_name select {
+        width: 100%;
+      }
+
+      .account input {
+        width: 100%;
+      }
+
+      .bank_name label,
+      .account label {
+        display: block;
+      }
+
+      @media (max-width: 768px) {
+        .bank_name,
+        .account {
+          width: 100%;
+          margin-right: 0;
+        }
+      }
+      option {
+        width: 30%;
       }
     </style>
-    <link rel="stylesheet" href="../style.css" />
   </head>
   <body>
     <header>
@@ -88,7 +112,6 @@
         <input type="tel" name="phone" placeholder="전화번호" required />
         <input type="email" name="email" placeholder="이메일" required />
         <div class="buisiness">
-          <!-- 사업자 번호 입력 -->
           <input
             type="text"
             name="business_number_1"
@@ -116,23 +139,24 @@
             required
           />
         </div>
+        <div style="display: inline-flex">
+          <select name="bank_name" id="bank_name" class="bank_name" required>
+            <option value="" disabled selected hidden>은행명 선택</option>
+            <option value="국민은행">국민은행</option>
+            <option value="기업은행">기업은행</option>
+            <option value="신한은행">신한은행</option>
+            <!-- 다른 은행들도 추가할 수 있습니다 -->
+          </select>
+          <input
+            type="text"
+            name="account_number"
+            id="account_number"
+            class="account"
+            placeholder="계좌번호"
+            required
+          />
+        </div>
 
-        <!-- 은행명 선택 -->
-        <select name="bank_name" class="bank_name" required>
-          <option value="" disabled selected hidden>은행명 선택</option>
-          <option value="국민은행">국민은행</option>
-          <option value="기업은행">기업은행</option>
-          <option value="신한은행">신한은행</option>
-          <!-- 다른 은행들도 추가할 수 있습니다 -->
-        </select>
-        <!-- 정산계좌 정보 입력 -->
-        <input
-          type="text"
-          name="account_number"
-          placeholder="계좌번호"
-          required
-          class="account"
-        />
         <input
           type="text"
           name="account_holder"
