@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>회원가입</title>
+    <link
+      href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../style.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f3f3f3;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      input,
+      select {
+        margin-bottom: 10px;
+        padding: 8px;
+        width: 300px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      input[type="submit"] {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+      }
+
+      input[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+
+      .form_frame {
+        margin-top: 50px;
+      }
+
+      #business_number_1,
+      #business_number_2,
+      #business_number_3 {
+        width: 15%;
+      }
+
+      .buisiness {
+        width: auto;
+        padding-left: 15%;
+      }
+
+      .bank_name,
+      .account {
+        display: inline-block;
+        width: 48%; /* Adjust the width as needed */
+        margin-right: 4%; /* Adjust the margin as needed */
+      }
+
+      .bank_name select {
+        width: 100%;
+      }
+
+      .account input {
+        width: 100%;
+      }
+
+      .bank_name label,
+      .account label {
+        display: block;
+      }
+
+      @media (max-width: 768px) {
+        .bank_name,
+        .account {
+          width: 100%;
+          margin-right: 0;
+        }
+      }
+      option {
+        width: 30%;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>쇼핑몰</h1>
+      </div>
+    </header>
+    <div class="form_frame">
+      <form action="myapi" method="post">
+        <input type="text" name="name" placeholder="이름" required />
+        <input type="text" name="id" placeholder="아이디" required />
+        <input
+          type="password"
+          name="password"
+          placeholder="비밀번호"
+          required
+        />
+        <input type="tel" name="phone" placeholder="전화번호" required />
+        <input type="email" name="email" placeholder="이메일" required />
+        <div class="buisiness">
+          <input
+            type="text"
+            name="business_number_1"
+            id="business_number_1"
+            maxlength="3"
+            placeholder="123"
+            required
+          />
+          -
+          <input
+            type="text"
+            name="business_number_2"
+            id="business_number_2"
+            maxlength="2"
+            placeholder="45"
+            required
+          />
+          -
+          <input
+            type="text"
+            name="business_number_3"
+            id="business_number_3"
+            maxlength="5"
+            placeholder="67890"
+            required
+          />
+        </div>
+        <div style="display: inline-flex">
+          <select name="bank_name" id="bank_name" class="bank_name" required>
+            <option value="" disabled selected hidden>은행명 선택</option>
+            <option value="국민은행">국민은행</option>
+            <option value="기업은행">기업은행</option>
+            <option value="신한은행">신한은행</option>
+            <!-- 다른 은행들도 추가할 수 있습니다 -->
+          </select>
+          <input
+            type="text"
+            name="account_number"
+            id="account_number"
+            class="account"
+            placeholder="계좌번호"
+            required
+          />
+        </div>
+
+        <input
+          type="text"
+          name="account_holder"
+          placeholder="예금주명"
+          required
+        />
+        <input type="submit" value="가입하기" />
+      </form>
+    </div>
+    <script>
+      const input1 = document.getElementById("business_number_1");
+      const input2 = document.getElementById("business_number_2");
+      const input3 = document.getElementById("business_number_3");
+
+      input1.addEventListener("input", function () {
+        if (this.value.length >= parseInt(this.getAttribute("maxlength"))) {
+          input2.focus();
+        }
+      });
+
+      input2.addEventListener("input", function () {
+        if (this.value.length >= parseInt(this.getAttribute("maxlength"))) {
+          input3.focus();
+        }
+      });
+
+      input3.addEventListener("input", function () {
+        if (this.value.length >= parseInt(this.getAttribute("maxlength"))) {
+          this.blur();
+        }
+      });
+    </script>
+  </body>
+</html>

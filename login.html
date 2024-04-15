@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>로그인</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f3f3f3;
+      }
+      .container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-top: 100px;
+      }
+      .container h2 {
+        text-align: center;
+      }
+      .login-form {
+        margin-top: 20px;
+      }
+      .login-form input[type="text"],
+      .login-form input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
+      .login-form input[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        background-color: #4caf50;
+        border: none;
+        color: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .login-form input[type="submit"]:hover {
+        background-color: #45a049;
+      }
+      .login-form .link {
+        text-align: center;
+        margin-top: 10px;
+      }
+      .login-form .link a {
+        color: #007bff;
+        text-decoration: none;
+      }
+      .login-form .link a:hover {
+        text-decoration: underline;
+      }
+      .social-login {
+        display: flex;
+        justify-content: space-between;
+      }
+      .social-login button {
+        width: 48%;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        text-align: center;
+      }
+      .social-login .kakao-login {
+        background-color: #fee500;
+        color: #000;
+      }
+      .social-login .google-login {
+        background-color: #4285f4;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>로그인</h2>
+      <form class="login-form" action="#" method="POST">
+        <input type="text" name="username" placeholder="사용자 이름" required />
+        <input
+          type="password"
+          name="password"
+          placeholder="비밀번호"
+          required
+        />
+        <input type="submit" value="일반 로그인" />
+      </form>
+      <div class="social-login">
+        <button class="kakao-login">카카오 로그인</button>
+        <button class="google-login">구글 로그인</button>
+      </div>
+      <div class="link">계정이 없으신가요? <a href="./user_enter.html">회원가입</a></div>
+      <div class="link">
+        <a href="Sale/admin.html">판매자로 로그인</a>
+        <a href="index.html">홈으로</a>
+      </div>
+    </div>
+  </body>
+</html>
