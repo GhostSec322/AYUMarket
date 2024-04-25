@@ -34,4 +34,3 @@ def get_image(request, filename):
         return HttpResponse(photo_data, content_type='image/png')
     except FileNotFoundError:
         return HttpResponse(status=404)
-# Create your views here.
