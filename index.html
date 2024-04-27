@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <title>쇼핑몰</title>
     <style>
       body {
@@ -147,45 +148,11 @@
           <input type="submit" value="검색" />
         </form>
       </div>
-      <ul class="product-list">
-        <li class="product">
-          <img
-            src="https://cdn.pixabay.com/photo/2024/02/14/13/13/hamburg-8573427_640.jpg"
-            alt="Product 1"
-          />
-          <h3>상품 1</h3>
-          <p class="product-price">₩50,000</p>
-          <form action="./product_detail.html" method="GET">
-            <input type="hidden" name="product_id" value="1" />
-            <input type="submit" value="더보기" />
-          </form>
-        </li>
-        <li class="product">
-          <img
-            src="https://cdn.pixabay.com/photo/2023/11/23/20/40/ocean-8408693_640.jpg"
-            alt="Product 2"
-          />
-          <h3>상품 2</h3>
-          <p class="product-price">₩65,000</p>
-          <form action="./product_detail.html" method="GET">
-            <input type="hidden" name="product_id" value="2" />
-            <input type="submit" value="더보기" />
-          </form>
-        </li>
-        <li class="product">
-          <img
-            src="https://cdn.pixabay.com/photo/2023/12/14/00/20/alaska-8448009_1280.jpg"
-            alt="Product 3"
-          />
-          <h3>상품 3</h3>
-          <p class="product-price">₩80,000</p>
-          <form action="./product_detail.html" method="GET">
-            <input type="hidden" name="product_id" value="3" />
-            <input type="submit" value="더보기" />
-          </form>
-        </li>
+      <ul class="product-list" id="product-list">
+       
         <!-- 추가적인 상품들을 원하는 만큼 추가 -->
       </ul>
     </div>
+    <script src="./indexScript.js"></script>
   </body>
 </html>
