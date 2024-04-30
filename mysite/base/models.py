@@ -10,3 +10,45 @@ class Example(models.Model):
 
     class Meta:
         ordering = ['created']
+
+class UserLogin(models.Model):
+    username = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
+    user_name = models.CharField(max_length=255)
+    tel = models.CharField(max_length=20)
+    email = models.EmailField(max_length=255)
+
+class Review(models.Model):
+    item = models.ForeignKey('Item', on_delete=models.CASCADE)
+    user = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
+    content = models.CharField(max_length=255)
+    star = models.IntegerField()
+
+class Qna(models.Model):
+    question = models.CharField(max_length=255)
+    answer = models.CharField(max_length=255)
+
+class Item(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.CharField(max_length=255)
+    price = models.IntegerField()
+    photo = models.CharField(max_length=255)
+    stock = models.IntegerField()
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
+
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+
+class Cart(models.Model):
+    item = models.ForeignKey('Item', on_delete=models.CASCADE)
+    username = models.CharField(max_length=255)
+    count = models.IntegerField()
+
+class Order(models.Model):
+    item = models.ForeignKey('Item', on_delete=models.CASCADE)
+    username = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
+    price = models.IntegerField()
+    count = models.IntegerField()
+    state = models.CharField(max_length=255)

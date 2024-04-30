@@ -1,6 +1,9 @@
 from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from .models import Qna
+from .serializers import QnaSerializer
 from base.models import Example
 from base.serializers import ExampleSerializer
 import os
@@ -34,3 +37,9 @@ def get_image(request, filename):
         return HttpResponse(photo_data, content_type='image/png')
     except FileNotFoundError:
         return HttpResponse(status=404)
+
+class QnaList(APIView):
+    def get(self, request):
+        qna = Qna.objects.all()
+        serializer = QnaSerializer(qna, many=True)
+        return Response(serializer.data)
