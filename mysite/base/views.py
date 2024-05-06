@@ -38,7 +38,6 @@ def get_image(request, filename):
     except FileNotFoundError:
         return HttpResponse(status=404)
 
-<<<<<<< HEAD
 '''   
 @api_view(['GET']) #특정 상품 detail 가져오기 쿼리 파라미터 안쓴 ver
 def product_detail(request,pk):
