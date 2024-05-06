@@ -1,7 +1,10 @@
 from django.http import HttpResponse
 from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from .models import Qna
+from .serializers import QnaSerializer
 from base.models import Example
 from base.serializers import ExampleSerializer
 import os
@@ -35,6 +38,7 @@ def get_image(request, filename):
     except FileNotFoundError:
         return HttpResponse(status=404)
 
+<<<<<<< HEAD
 '''   
 @api_view(['GET']) #특정 상품 detail 가져오기 쿼리 파라미터 안쓴 ver
 def product_detail(request,pk):
@@ -61,3 +65,9 @@ def product_detail(request):
     
     serializer=ExampleSerializer(product)
     return Response(serializer.data)
+
+class QnaList(APIView):
+    def get(self, request):
+        qna = Qna.objects.all()
+        serializer = QnaSerializer(qna, many=True)
+        return Response(serializer.data)
