@@ -6,7 +6,9 @@ class ExampleSerializer(serializers.ModelSerializer):
         model = Example
         fields = ['id', 'created', 'title', 'price', 'photo', 'stock']
 
+
 class QnaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Qna
         fields = ['id', 'question', 'answer']
+
