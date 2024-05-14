@@ -10,7 +10,12 @@ class Example(models.Model):
 
     class Meta:
         ordering = ['created']
-
+class SellerLogin(models.Model):
+    username= models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
+    user_name= models.CharField(max_length=255)
+    tel = models.CharField(max_length=20)
+    email =models.EmailField(max_length=255)
 class UserLogin(models.Model):
     username = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
