@@ -32,7 +32,7 @@ class Review(models.Model):
 
 class Qna(models.Model):
     question = models.CharField(max_length=255)
-    answer = models.CharField(max_length=255)
+    answer = models.CharField(max_length=255,blank=True)
 
 class Item(models.Model):
     title = models.CharField(max_length=255)
