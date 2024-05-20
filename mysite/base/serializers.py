@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from base.models import Example
-from .models import Qna ,Review
+from .models import Qna ,Review,Order
 class ExampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Example
@@ -16,3 +16,7 @@ class ReviewSerializer(serializers.ModelSerializer):  # ReviewSerializer 추가
     class Meta:
         model = Review
         fields = ['id', 'item', 'user', 'title', 'content','star']
+class OrderSerialzer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields =['id','item','username','title','price','count','state']

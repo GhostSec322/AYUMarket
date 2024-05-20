@@ -3,8 +3,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Qna, Review
-from .serializers import QnaSerializer, ReviewSerializer
+from .models import Qna, Review ,Order
+from .serializers import QnaSerializer, ReviewSerializer,OrderSerialzer
 from base.models import Example
 from base.serializers import ExampleSerializer
 import os
@@ -61,3 +61,8 @@ class ReviewList(APIView):  # Review 대신 ReviewList로 클래스명 수정
         reviews = Review.objects.all()  # ReviewList 대신 reviews로 변수명 수정
         serializer = ReviewSerializer(reviews, many=True)  # ReviewSerializer로 변경
         return Response(serializer.data)
+class OrderList(APIView):
+    def get(slef,request):
+        order = Order.objects.all()
+        serizer = OrderSerialzer(order, many=True)
+        return Response(serizer.data)
