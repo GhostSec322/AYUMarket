@@ -5,8 +5,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Qna
 from .serializers import QnaSerializer
-from base.models import Example, UserLogin, Cart
-from base.serializers import ExampleSerializer, CartSerializer
+from base.models import Item, UserLogin, Cart
+from base.serializers import ItemSerializer, CartSerializer
 import os
 #from django.contrib.auth.models import User
 from rest_framework import generics
@@ -18,12 +18,12 @@ from rest_framework.permissions import IsAuthenticated
 @api_view(['GET','POST']) #나열할 상품 전체 가져오기
 def base_list(request, format=None):
     if request.method == 'GET':
-        baseData= Example.objects.all()
-        serializer=ExampleSerializer(baseData, many=True)
+        baseData= Item.objects.all()
+        serializer=ItemSerializer(baseData, many=True)
         return Response(serializer.data)
     
     elif request.method == 'POST':
-        serializer = ExampleSerializer(data=request.data)
+        serializer = ItemSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -63,12 +63,12 @@ def product_detail(request):
         return Response({'에러 에러 id 어디감?'},status=status.HTTP_400_BAD_REQUEST)
     
     try:
-        product=Example.objects.get(pk=product_id)
+        product=Item.objects.get(pk=product_id)
     
-    except Example.DoesNotExist:
+    except Item.DoesNotExist:
         return Response({'에러 id 번호가 없는디?'}, status=status.HTTP_404_NOT_FOUND)
     
-    serializer=ExampleSerializer(product)
+    serializer=ItemSerializer(product)
     return Response(serializer.data)
 
 class QnaList(APIView):

@@ -7,10 +7,10 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.validators import UniqueValidator
 
-class ExampleSerializer(serializers.ModelSerializer):
+class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Example
-        fields = ['id', 'created', 'title', 'price', 'photo', 'stock']
+        fields = ['id', 'title','content', 'price', 'photo', 'stock', 'category']
 
 
 class QnaSerializer(serializers.ModelSerializer):

@@ -4,7 +4,7 @@ from .views import QnaList
 from .views import Register,Login,Protected, CartList, CartDelete
 
 urlpatterns = [
-    path('example/', views.base_list),
+    path('itemlist/', views.base_list),
     path('getimage/<str:filename>/',views.get_image),
     #path('detail/<int:pk>/', views.product_detail),
     path('detail/',views.product_detail),
