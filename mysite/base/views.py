@@ -5,9 +5,12 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Qna
 from .serializers import QnaSerializer
-from base.models import Example
+from base.models import Example, UserLogin
 from base.serializers import ExampleSerializer
 import os
+#from django.contrib.auth.models import User
+from rest_framework import generics
+from .serializers import RegisterSerializer,LoginSerializer
 
 @api_view(['GET','POST']) #나열할 상품 전체 가져오기
 def base_list(request, format=None):
@@ -70,3 +73,31 @@ class QnaList(APIView):
         qna = Qna.objects.all()
         serializer = QnaSerializer(qna, many=True)
         return Response(serializer.data)
+
+#회원가입 클래스 기반 버전   
+class Register(generics.CreateAPIView):
+    queryset = UserLogin.objects.all()
+    serializer_class = RegisterSerializer
+
+    
+''' #회원가입 데코레이터 버전
+@api_view(['POST'])
+def register(request):
+    if request.method == 'POST':
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+'''
+
+#로그인 뷰
+class Login(generics.GenericAPIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        token = serializer.validated_data #토큰 가져오기
+        return Response({"token": token.key}, status=status.HTTP_200_OK)
+

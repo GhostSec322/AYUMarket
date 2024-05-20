@@ -1,6 +1,12 @@
 from rest_framework import serializers
-from base.models import Example
+from base.models import Example,UserLogin
 from .models import Qna
+from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
+from rest_framework.validators import UniqueValidator
+
 class ExampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Example
@@ -12,3 +18,62 @@ class QnaSerializer(serializers.ModelSerializer):
         model = Qna
         fields = ['id', 'question', 'answer']
 
+
+class RegisterSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        required=True,
+        validators=[UniqueValidator(queryset=UserLogin.objects.all())] #중복점검
+    )
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password], # 비밀번호에 대한 검증
+    )
+    email = serializers.EmailField(
+        required=True
+    )
+    user_name = serializers.CharField(
+        required=True
+    )
+    tel = serializers.CharField(
+        required=True
+    )
+
+    class Meta:
+        model = UserLogin
+        fields = ('username', 'password', 'email', 'user_name', 'tel')
+
+    def create(self, validated_data): # 유저 생성과 토큰을 생성 하는 메서드
+        user = UserLogin.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            user_name=validated_data['user_name'],
+            tel=validated_data['tel'],
+        )
+
+        user.set_password(validated_data['password'])
+        user.save()
+        token = Token.objects.create(user=user)
+        return user
+
+
+class UserLoginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=User
+        fields=('user_name', 'tel')
+
+class LoginSerializer(serializers.Serializer):
+    username= serializers.CharField(
+        required=True
+    )
+    password = serializers.CharField(
+        required=True,
+        write_only=True
+    )
+
+    def validate(self, data):
+        user = authenticate(**data)
+        if user:
+            token = Token.objects.get(user = user)
+            return token
+        raise serializers.ValidationError({'Error':"유저 가입이 안되어 있습니다."})
