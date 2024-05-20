@@ -1,8 +1,9 @@
-from django.urls import path
+from django.urls import path, include
 from base import views
 from .views import QnaList
 from .views import ReviewList ,OrderList
 urlpatterns = [
+    path('seller/',include('sellerpage.urls')),
     path('example/', views.base_list),
     path('getimage/<str:filename>/',views.get_image),
     #path('detail/<int:pk>/', views.product_detail),

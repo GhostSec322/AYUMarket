@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>로그인</title>
+    <link
+      href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../style.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f3f3f3;
+      }
+
+      .container {
+        text-align: center;
+        margin-top: 50px;
+      }
+
+      .login-form {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .login-form h2 {
+        margin-bottom: 20px;
+      }
+
+      .login-form input[type="text"],
+      .login-form input[type="password"],
+      .login-form input[type="submit"] {
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      .login-form input[type="submit"] {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+
+      .login-form input[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+
+      .waiting-page {
+        text-align: center;
+        margin-top: 50px;
+      }
+
+      .waiting-page h2 {
+        margin-bottom: 20px;
+      }
+
+      .waiting-page .icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+      }
+
+      .waiting-page p {
+        font-size: 18px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>쇼핑몰</h1>
+        <nav>
+          <ul>
+            <li class="dropdown">
+              <a href="#">카테고리</a>
+              <div class="dropdown-content">
+                <a href="#">의류</a>
+                <a href="#">신발</a>
+                <a href="#">액세서리</a>
+                <!-- 다른 카테고리를 원하는 만큼 추가 -->
+              </div>
+            </li>
+            <li><a href="./cart.html">장바구니</a></li>
+            <li><a href="./index.html">홈</a></li>
+            <li><a href="./login.html">로그인</a></li>
+            <li><a href="./mypage.html">마이페이지</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Waiting Page -->
+
+    <div class="waiting-page">
+      <div class="icon">
+        <i class="bx bx-time"></i>
+      </div>
+      <h2>승인 대기중</h2>
+      <p>회원가입한 정보를 검토 중입니다. 잠시만 기다려주세요.</p>
+      <p>문의사항은 아래의 전화번호로 연락해주시면 감사하겠습니다</p>
+      <p>010-1234-1234</p>
+    </div>
+  </body>
+</html>

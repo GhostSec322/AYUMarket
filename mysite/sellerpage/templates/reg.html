@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>상품 등록</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f3f3f3;
+        padding: 20px;
+      }
+      .container {
+        max-width: 400px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      form {
+        margin-top: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      input[type="submit"] {
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    </style>
+    <link rel="stylesheet" href="style2.css" />
+  </head>
+  <body>
+    <nav>
+      <ul>
+        <li><a href="./admin.html">판매량 통계</a></li>
+        <li><a href="./reg.html">상품 등록</a></li>
+        <li><a href="./QnA.html">상품별 QnA</a></li>
+        <li><a href="Del.html">결제 확인 및 배송 관리</a></li>
+        <li><a href="otder.html">주문요청</a></li>
+        <li><a href="refund.html">환불요청</a></li>
+      </ul>
+    </nav>
+    <div class="container">
+      <h1>상품 등록</h1>
+      <form action="" method="POST">
+        <label for="product_name">상품명:</label>
+        <input type="text" id="product_name" name="product_name" />
+        <label for="price">가격:</label>
+        <input type="text" id="price" name="price" />
+        <input type="submit" value="등록" />
+      </form>
+    </div>
+  </body>
+</html>
