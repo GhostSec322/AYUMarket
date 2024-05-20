@@ -25,7 +25,12 @@ SECRET_KEY = 'django-insecure-or)d7ce5bikt-v3-#92tb0ef8k!#1n$_=up6m%f2#2638gqc0p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+#유저 검증시 필요
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'kubernetes.docker.internal'
+]
 
 
 # Application definition
@@ -122,7 +127,7 @@ REST_FRAMEWORK ={
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 

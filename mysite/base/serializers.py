@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from base.models import Example,UserLogin
+from base.models import Example,UserLogin, Item, Cart
 from .models import Qna
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
@@ -77,3 +77,31 @@ class LoginSerializer(serializers.Serializer):
             token = Token.objects.get(user = user)
             return token
         raise serializers.ValidationError({'Error':"유저 가입이 안되어 있습니다."})
+
+
+class ItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = ['id','title','content', 'price', 'photo', 'stock', 'category']
+
+class CartSerializer(serializers.ModelSerializer):
+    item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all())
+    user = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        model = Cart
+        fields = ['id', 'item', 'user', 'count']
+        read_only_fields=['user']
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        item = validated_data['item']
+        count = validated_data.get('count', 1)
+
+
+        cart = Cart.objects.update_or_create(
+            item=item,
+            user= user,
+            defaults={'count': count}
+        )
+        return cart

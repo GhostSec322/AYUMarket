@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, UserManager,BaseUserManager
+from django.conf import settings
 
 # Create your models here.
 class Example(models.Model):
@@ -84,8 +85,11 @@ class Category(models.Model):
 
 class Cart(models.Model):
     item = models.ForeignKey('Item', on_delete=models.CASCADE)
-    username = models.CharField(max_length=255)
-    count = models.IntegerField()
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    count = models.PositiveBigIntegerField(default=1)
+
+    class Meta:
+        unique_together = ('item', 'user')
 
 class Order(models.Model):
     item = models.ForeignKey('Item', on_delete=models.CASCADE)

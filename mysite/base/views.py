@@ -5,12 +5,15 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Qna
 from .serializers import QnaSerializer
-from base.models import Example, UserLogin
-from base.serializers import ExampleSerializer
+from base.models import Example, UserLogin, Cart
+from base.serializers import ExampleSerializer, CartSerializer
 import os
 #from django.contrib.auth.models import User
 from rest_framework import generics
 from .serializers import RegisterSerializer,LoginSerializer
+
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 @api_view(['GET','POST']) #나열할 상품 전체 가져오기
 def base_list(request, format=None):
@@ -101,3 +104,30 @@ class Login(generics.GenericAPIView):
         token = serializer.validated_data #토큰 가져오기
         return Response({"token": token.key}, status=status.HTTP_200_OK)
 
+#로그인 되었을때 접근하는 뷰
+class Protected(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        return Response({"message": "This is a protected view"})
+    
+#(로그인 후) 장바구니 품목 생성 및 업데이트
+class CartList(generics.ListCreateAPIView):
+    serializer_class = CartSerializer
+    permission_classes =[IsAuthenticated]
+
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class CartDelete(generics.RetrieveDestroyAPIView):
+    serializer_class = CartSerializer
+    permission_classes =[IsAuthenticated]
+
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user)
+
+    
