@@ -11,5 +11,6 @@ urlpatterns = [
     path('qna/item/<int:item_id>/', views.qna_list_by_item, name='qna-list-by-item'), 
     path('orders/', OrderListByUsername.as_view(), name='order-list-by-username'),
     path('monthly-completed-orders-price/', MonthlyCompletedOrdersPriceAPI.as_view(), name='monthly_completed_orders_price'),
+    path('refund-requests/', RefundRequestListCreateAPI.as_view(), name='refund_request_list_create'),
 ]
 

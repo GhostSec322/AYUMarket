@@ -56,4 +56,10 @@ class Order(models.Model):
     count = models.IntegerField()
     state = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
+
+class RefundRequest(models.Model):
+    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    reason = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    approved = models.BooleanField(default=False)  # 승인 여부
     

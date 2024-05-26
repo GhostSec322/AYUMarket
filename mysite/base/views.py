@@ -3,13 +3,16 @@ from rest_framework import status,generics
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Qna,Order
+from .models import Qna,Order,RefundRequest
 from .serializers import QnaSerializer,OrderSerializer
 from base.models import Example
 from base.serializers import ExampleSerializer
 import os
 from django.utils import timezone
 import datetime
+
+from .serializers import RefundRequestSerializer
+
 @api_view(['GET','POST']) #나열할 상품 전체 가져오기
 def base_list(request, format=None):
     if request.method == 'GET':
@@ -103,3 +106,17 @@ class MonthlyCompletedOrdersPriceAPI(generics.ListAPIView):
         # 한 달 전부터 현재까지 배송완료된 주문들의 총 가격을 합산
         completed_orders = Order.objects.filter(state='배송완료', created_at__gte=one_month_ago)
         return completed_orders
+    
+class RefundRequestListCreateAPI(generics.ListCreateAPIView):
+    queryset = RefundRequest.objects.all()
+    serializer_class = RefundRequestSerializer
+
+    def create(self, request, *args, **kwargs):
+        # 요청된 데이터로 새로운 환불 요청 생성
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        
+        # 생성된 환불 요청 데이터와 함께 승인 여부를 반환
+        approved = serializer.validated_data.get('approved')
+        return Response({'refund_request': serializer.data, 'approved': approved}, status=status.HTTP_201_CREATED)

@@ -32,4 +32,7 @@ class Cart(serializers.ModelSerializer):
     class Meta:
         models=Cart
         fields ='__all__'
-        
+class RefundRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RefundRequest
+        fields = ['order', 'reason', 'created_at', 'approved']
