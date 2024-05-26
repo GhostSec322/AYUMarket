@@ -1,13 +1,17 @@
 from django.http import HttpResponse
-from rest_framework import status
+from rest_framework import status,generics
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Qna
-from .serializers import QnaSerializer
+from .models import Qna,Order,RefundRequest
+from .serializers import QnaSerializer,OrderSerializer
 from base.models import Example
 from base.serializers import ExampleSerializer
 import os
+from django.utils import timezone
+import datetime
+
+from .serializers import RefundRequestSerializer
 
 @api_view(['GET','POST']) #나열할 상품 전체 가져오기
 def base_list(request, format=None):
@@ -65,8 +69,54 @@ def product_detail(request):
     serializer=ExampleSerializer(product)
     return Response(serializer.data)
 
-class QnaList(APIView):
-    def get(self, request):
-        qna = Qna.objects.all()
-        serializer = QnaSerializer(qna, many=True)
-        return Response(serializer.data)
+@api_view(['GET'])
+def qna_list(request):
+    qna = Qna.objects.all()
+    serializer = QnaSerializer(qna, many=True)
+    return Response(serializer.data)
+class OrderListByUsername(generics.ListAPIView):
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        username = self.request.query_params.get('username')
+        if username is not None:
+            return Order.objects.filter(username=username)
+        return Order.objects.all()
+    
+@api_view(['GET'])
+def qna_list_by_item(request, item_id):
+    qnas = Qna.objects.filter(item__id=item_id)
+    if not qnas.exists():
+        return Response({'error': 'No QnA found for the given item id'}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = QnaSerializer(qnas, many=True)
+    return Response(serializer.data)
+
+
+class MonthlyCompletedOrdersPriceAPI(generics.ListAPIView):
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        # 현재 시간
+        today = timezone.now()
+
+        # 한 달 전의 시간
+        one_month_ago = today - datetime.timedelta(days=30)
+
+        # 한 달 전부터 현재까지 배송완료된 주문들의 총 가격을 합산
+        completed_orders = Order.objects.filter(state='배송완료', created_at__gte=one_month_ago)
+        return completed_orders
+    
+class RefundRequestListCreateAPI(generics.ListCreateAPIView):
+    queryset = RefundRequest.objects.all()
+    serializer_class = RefundRequestSerializer
+
+    def create(self, request, *args, **kwargs):
+        # 요청된 데이터로 새로운 환불 요청 생성
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        
+        # 생성된 환불 요청 데이터와 함께 승인 여부를 반환
+        approved = serializer.validated_data.get('approved')
+        return Response({'refund_request': serializer.data, 'approved': approved}, status=status.HTTP_201_CREATED)
