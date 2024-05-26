@@ -68,20 +68,23 @@ class Review(models.Model):
     content = models.CharField(max_length=255)
     star = models.IntegerField()
 
+
+class Item(models.Model):
+    title = models.CharField(max_length=255) ## 상품제목
+    content = models.CharField(max_length=255) ## 상세내용
+    price = models.IntegerField() ## 가격
+    photo = models.ImageField(upload_to='photos/')  #상품이미지
+    stock = models.IntegerField()## 재고량
+    category = models.ForeignKey('Category', on_delete=models.CASCADE) ##카테고리
+
+
 class Qna(models.Model):
     question = models.CharField(max_length=255)
     answer = models.CharField(max_length=255)
-
-class Item(models.Model):
-    title = models.CharField(max_length=255)
-    content = models.CharField(max_length=255)
-    price = models.IntegerField()
-    photo = models.CharField(max_length=255)
-    stock = models.IntegerField()
-    category = models.ForeignKey('Category', on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='qnas',null=True)
 
 class Category(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255) ## 카테고리명 
 
 class Cart(models.Model):
     item = models.ForeignKey('Item', on_delete=models.CASCADE)
@@ -98,3 +101,11 @@ class Order(models.Model):
     price = models.IntegerField()
     count = models.IntegerField()
     state = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class RefundRequest(models.Model):
+    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    reason = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    approved = models.BooleanField(default=False)  # 승인 여부
+    

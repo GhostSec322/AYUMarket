@@ -1,17 +1,17 @@
 from django.http import HttpResponse
-from rest_framework import status
+from rest_framework import status,generics
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Qna
-from .serializers import CarListtSerializer, CartGetSerializer, QnaSerializer
-from base.models import Item, UserLogin, Cart
-from base.serializers import ItemSerializer, CartSerializer
+from .models import Cart, Item, Qna,Order,RefundRequest, UserLogin
+from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer
+from base.models import Example
+from base.serializers import ExampleSerializer
 import os
-#from django.contrib.auth.models import User
-from rest_framework import generics
-from .serializers import RegisterSerializer,LoginSerializer
+from django.utils import timezone
+import datetime
 
+from .serializers import RefundRequestSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
@@ -142,3 +142,54 @@ class CartDelete(generics.RetrieveDestroyAPIView):
         return Cart.objects.filter(user=self.request.user)
 
     
+@api_view(['GET'])
+def qna_list(request):
+    qna = Qna.objects.all()
+    serializer = QnaSerializer(qna, many=True)
+    return Response(serializer.data)
+class OrderListByUsername(generics.ListAPIView):
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        username = self.request.query_params.get('username')
+        if username is not None:
+            return Order.objects.filter(username=username)
+        return Order.objects.all()
+    
+@api_view(['GET'])
+def qna_list_by_item(request, item_id):
+    qnas = Qna.objects.filter(item__id=item_id)
+    if not qnas.exists():
+        return Response({'error': 'No QnA found for the given item id'}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = QnaSerializer(qnas, many=True)
+    return Response(serializer.data)
+
+
+class MonthlyCompletedOrdersPriceAPI(generics.ListAPIView):
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        # 현재 시간
+        today = timezone.now()
+
+        # 한 달 전의 시간
+        one_month_ago = today - datetime.timedelta(days=30)
+
+        # 한 달 전부터 현재까지 배송완료된 주문들의 총 가격을 합산
+        completed_orders = Order.objects.filter(state='배송완료', created_at__gte=one_month_ago)
+        return completed_orders
+    
+class RefundRequestListCreateAPI(generics.ListCreateAPIView):
+    queryset = RefundRequest.objects.all()
+    serializer_class = RefundRequestSerializer
+
+    def create(self, request, *args, **kwargs):
+        # 요청된 데이터로 새로운 환불 요청 생성
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        
+        # 생성된 환불 요청 데이터와 함께 승인 여부를 반환
+        approved = serializer.validated_data.get('approved')
+        return Response({'refund_request': serializer.data, 'approved': approved}, status=status.HTTP_201_CREATED)

@@ -1,2 +1,8 @@
 #env환경 빼기
 env/
+ven/
+
+mysite/base/__pycache__
+mysite/base/migrations
+mysite/mysite/__pycache__
+mysite/db.sqlite3
