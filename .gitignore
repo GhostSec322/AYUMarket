@@ -2,7 +2,11 @@
 env/
 ven/
 
-mysite/base/__pycache__/
-mysite/base/migrations/
-mysite/mysite/__pycache__/
-mysite/db.sqlite3/
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media

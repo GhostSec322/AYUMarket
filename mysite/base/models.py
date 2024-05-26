@@ -73,7 +73,7 @@ class Item(models.Model):
     title = models.CharField(max_length=255) ## 상품제목
     content = models.CharField(max_length=255) ## 상세내용
     price = models.IntegerField() ## 가격
-    photo = models.ImageField(upload_to='photos/')  #상품이미지
+    photo = models.CharField(max_length=255)  #상품이미지
     stock = models.IntegerField()## 재고량
     category = models.ForeignKey('Category', on_delete=models.CASCADE) ##카테고리
 

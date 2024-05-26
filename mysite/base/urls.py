@@ -12,6 +12,7 @@ urlpatterns = [
     path('orders/', OrderListByUsername.as_view(), name='order-list-by-username'),
     path('monthly-completed-orders-price/', MonthlyCompletedOrdersPriceAPI.as_view(), name='monthly_completed_orders_price'),
     path('refund-requests/', RefundRequestListCreateAPI.as_view(), name='refund_request_list_create'),
+    path('itemlist/', views.base_list),
     path('register/', Register.as_view()),
     path('login/', Login.as_view()),
     path('protected/', Protected.as_view()),

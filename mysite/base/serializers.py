@@ -1,19 +1,13 @@
 from rest_framework import serializers
-<<<<<<< HEAD
-from base.models import Example,UserLogin, Item, Cart
-from .models import Qna
+from base.models import Example
+from .models import *
+from django.contrib.auth.password_validation import validate_password
+from rest_framework.validators import UniqueValidator
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from django.contrib.auth.password_validation import validate_password
-from rest_framework.validators import UniqueValidator
 
-class ItemSerializer(serializers.ModelSerializer):
-=======
-from base.models import Example
-from .models import *
 class ExampleSerializer(serializers.ModelSerializer):
->>>>>>> 32ae89e8439a5d49ee0f2b5a4bc74682c91876bf
     class Meta:
         model = Example
         fields = ['id', 'title','content', 'price', 'photo', 'stock', 'category']
@@ -28,7 +22,6 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = '__all__'
 
-<<<<<<< HEAD
 
 class RegisterSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
@@ -131,25 +124,24 @@ class CartGetSerializer(serializers.ModelSerializer):
         model =Cart
         fields = ['id', 'item', 'user','count']
         read_only_fields=['user']
-=======
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model= Review
         fields= '__all__'
-class ItemSerializer(serializers.ModelSerializer):
+'''class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         models=Item
         fields= '__all__'
+        '''
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         models= Category
         fields= '__all__'
-class Cart(serializers.ModelSerializer):
-    class Meta:
-        models=Cart
-        fields ='__all__'
+#class Cart(serializers.ModelSerializer):
+#    class Meta:
+#        models=Cart
+#        fields ='__all__'
 class RefundRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = RefundRequest
         fields = ['order', 'reason', 'created_at', 'approved']
->>>>>>> 32ae89e8439a5d49ee0f2b5a4bc74682c91876bf
