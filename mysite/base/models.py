@@ -77,6 +77,8 @@ class Item(models.Model):
     stock = models.IntegerField()## 재고량
     category = models.ForeignKey('Category', on_delete=models.CASCADE) ##카테고리
 
+    def __str__(self):
+        return self.title
 
 class Qna(models.Model):
     question = models.CharField(max_length=255)
@@ -85,6 +87,9 @@ class Qna(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=255) ## 카테고리명 
+
+    def __str__(self):
+        return self.name
 
 class Cart(models.Model):
     item = models.ForeignKey('Item', on_delete=models.CASCADE)
@@ -97,11 +102,21 @@ class Cart(models.Model):
 class Order(models.Model):
     item = models.ForeignKey('Item', on_delete=models.CASCADE)
     username = models.CharField(max_length=255)
-    title = models.CharField(max_length=255)
-    price = models.IntegerField()
+    title = models.CharField(max_length=255, editable = False)
+    price = models.IntegerField(editable= False)
     count = models.IntegerField()
     state = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def get_item_title(self):
+        return self.item.title
+
+    def save(self, *args, **kwargs):
+        self.title = self.item.title
+        self.item.stock -= self.count
+        self.item.save()
+        self.price = self.item.price * self.count
+        super(Order, self).save(*args, **kwargs)
 
 class RefundRequest(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE)
