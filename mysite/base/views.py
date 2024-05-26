@@ -1,10 +1,10 @@
 from django.http import HttpResponse
-from rest_framework import status
+from rest_framework import status,generics
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Qna
-from .serializers import QnaSerializer
+from .models import Qna,Order
+from .serializers import QnaSerializer,OrderSerializer
 from base.models import Example
 from base.serializers import ExampleSerializer
 import os
@@ -65,8 +65,25 @@ def product_detail(request):
     serializer=ExampleSerializer(product)
     return Response(serializer.data)
 
-class QnaList(APIView):
-    def get(self, request):
-        qna = Qna.objects.all()
-        serializer = QnaSerializer(qna, many=True)
-        return Response(serializer.data)
+@api_view(['GET'])
+def qna_list(request):
+    qna = Qna.objects.all()
+    serializer = QnaSerializer(qna, many=True)
+    return Response(serializer.data)
+class OrderListByUsername(generics.ListAPIView):
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        username = self.request.query_params.get('username')
+        if username is not None:
+            return Order.objects.filter(username=username)
+        return Order.objects.all()
+    
+@api_view(['GET'])
+def qna_list_by_item(request, item_id):
+    qnas = Qna.objects.filter(item__id=item_id)
+    if not qnas.exists():
+        return Response({'error': 'No QnA found for the given item id'}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = QnaSerializer(qnas, many=True)
+    return Response(serializer.data)
