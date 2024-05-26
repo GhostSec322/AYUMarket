@@ -84,13 +84,19 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = ['id','title','content', 'price', 'photo', 'stock', 'category']
 
+class CarListtSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = "__all__"
+
+
 class CartSerializer(serializers.ModelSerializer):
-    item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all())
+    item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all(), write_only=True)
     user = serializers.ReadOnlyField(source='user.username')
 
     class Meta:
         model = Cart
-        fields = ['id', 'item', 'user', 'count']
+        fields = ['id', 'item', 'user']
         read_only_fields=['user']
 
     def create(self, validated_data):
@@ -105,3 +111,12 @@ class CartSerializer(serializers.ModelSerializer):
             defaults={'count': count}
         )
         return cart
+    
+class CartGetSerializer(serializers.ModelSerializer):
+    item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all(), write_only=True)
+    user = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        model =Cart
+        fields = ['id', 'item', 'user','count']
+        read_only_fields=['user']

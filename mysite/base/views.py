@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Qna
-from .serializers import QnaSerializer
+from .serializers import CarListtSerializer, CartGetSerializer, QnaSerializer
 from base.models import Item, UserLogin, Cart
 from base.serializers import ItemSerializer, CartSerializer
 import os
@@ -116,6 +116,17 @@ class Protected(APIView):
 class CartList(generics.ListCreateAPIView):
     serializer_class = CartSerializer
     permission_classes =[IsAuthenticated]
+
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+#(로그인 후) 사용자별 장바구니 품목 조회
+class CartGet(generics.ListCreateAPIView):
+    serializer_class = CartGetSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Cart.objects.filter(user=self.request.user)

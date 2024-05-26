@@ -1,7 +1,7 @@
 from django.urls import path
 from base import views
 from .views import QnaList
-from .views import Register,Login,Protected, CartList, CartDelete
+from .views import Register,Login,Protected, CartList, CartDelete, CartGet
 
 urlpatterns = [
     path('itemlist/', views.base_list),
@@ -13,5 +13,6 @@ urlpatterns = [
     path('login/', Login.as_view()),
     path('protected/', Protected.as_view()),
     path('cart/', CartList.as_view()),
+    path('cartget/', CartGet.as_view()),
     path('cart/<int:pk>/', CartDelete.as_view()),
 ]
