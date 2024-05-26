@@ -2,7 +2,7 @@
 env/
 ven/
 
-mysite/base/__pycache__
-mysite/base/migrations
-mysite/mysite/__pycache__
-mysite/db.sqlite3
+mysite/base/__pycache__/
+mysite/base/migrations/
+mysite/mysite/__pycache__/
+mysite/db.sqlite3/
