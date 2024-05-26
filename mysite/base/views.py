@@ -1,9 +1,11 @@
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Qna
-from .serializers import QnaSerializer
+from django.db import transaction
+from .models import Qna, Order, Item
+from django.shortcuts import render, redirect, get_object_or_404
+from .serializers import QnaSerializer, OrderPrcCntSerializer
 from base.models import Example
 from base.serializers import ExampleSerializer
 import os
@@ -43,3 +45,35 @@ class QnaList(APIView):
         qna = Qna.objects.all()
         serializer = QnaSerializer(qna, many=True)
         return Response(serializer.data)
+    
+class OrderPrcCntViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderPrcCntSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        data = serializer.data
+
+        # 주문의 가격과 수량 추가
+        for order_data in data:
+            order_instance = Order.objects.get(id=order_data['id'])
+            order_data['price'] = order_instance.price
+            order_data['count'] = order_instance.count
+
+        return Response(data)
+
+def create_ordre(request):
+    if request.method == 'POST':
+        item_id = request.POST['item_id']
+        username = request.POST['username']
+        count = int(request.POST['count'])
+
+        item = Item.objects.get(id=item_id)
+        order = Order(item=item, username= username, count=count)
+        order.save()
+
+        return HttpResponse('주문이 정상적으로 처리되었습니다.')
+    else:
+        items = Item.objects.all()
+        return render(request,{'items': items})

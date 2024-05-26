@@ -37,8 +37,15 @@ class Item(models.Model):
     stock = models.IntegerField()
     category = models.ForeignKey('Category', on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.title
+
 class Category(models.Model):
     name = models.CharField(max_length=255)
+
+# 카테고리 이름 보이게 하기
+    def __str__(self):
+        return self.name
 
 class Cart(models.Model):
     item = models.ForeignKey('Item', on_delete=models.CASCADE)
@@ -49,6 +56,13 @@ class Order(models.Model):
     item = models.ForeignKey('Item', on_delete=models.CASCADE)
     username = models.CharField(max_length=255)
     title = models.CharField(max_length=255)
-    price = models.IntegerField()
+    price = models.IntegerField(editable= False)
     count = models.IntegerField()
-    state = models.CharField(max_length=255)
+    state = models.CharField(max_length=255) #나중에 사용
+
+    def get_item_title(self):
+        return self.item.title
+
+    def save(self, *args, **kwargs):
+        self.price = self.item.price * self.count
+        super(Order, self).save(*args, **kwargs)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from base.models import Example
-from .models import Qna
+from .models import Qna, Order
 class ExampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Example
@@ -10,3 +10,9 @@ class QnaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Qna
         fields = ['id', 'question', 'answer']
+
+
+class OrderPrcCntSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['price','count']
