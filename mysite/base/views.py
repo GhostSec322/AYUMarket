@@ -8,7 +8,8 @@ from .serializers import QnaSerializer,OrderSerializer
 from base.models import Example
 from base.serializers import ExampleSerializer
 import os
-
+from django.utils import timezone
+import datetime
 @api_view(['GET','POST']) #나열할 상품 전체 가져오기
 def base_list(request, format=None):
     if request.method == 'GET':
@@ -87,3 +88,18 @@ def qna_list_by_item(request, item_id):
     
     serializer = QnaSerializer(qnas, many=True)
     return Response(serializer.data)
+
+
+class MonthlyCompletedOrdersPriceAPI(generics.ListAPIView):
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        # 현재 시간
+        today = timezone.now()
+
+        # 한 달 전의 시간
+        one_month_ago = today - datetime.timedelta(days=30)
+
+        # 한 달 전부터 현재까지 배송완료된 주문들의 총 가격을 합산
+        completed_orders = Order.objects.filter(state='배송완료', created_at__gte=one_month_ago)
+        return completed_orders

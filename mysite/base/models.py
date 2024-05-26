@@ -55,3 +55,5 @@ class Order(models.Model):
     price = models.IntegerField()
     count = models.IntegerField()
     state = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
