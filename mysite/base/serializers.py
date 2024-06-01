@@ -124,10 +124,10 @@ class CartGetSerializer(serializers.ModelSerializer):
         model =Cart
         fields = ['id', 'item', 'user','count']
         read_only_fields=['user']
-class ReviewSerializer(serializers.ModelSerializer):
+'''class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model= Review
-        fields= '__all__'
+        fields= '__all__'''
 '''class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         models=Item
@@ -145,3 +145,13 @@ class RefundRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = RefundRequest
         fields = ['order', 'reason', 'created_at', 'approved']
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
+    item = serializers.ReadOnlyField(source='item.id')
+    
+    class Meta:
+        model = Review
+        fields = ['id', 'item', 'user', 'title', 'content', 'star']
+        read_only_fields = ['user']
