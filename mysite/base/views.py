@@ -1,8 +1,12 @@
 from django.http import HttpResponse
-from rest_framework import status, generics
+from rest_framework import status, generics, permissions
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+from .permissions import IsOwnerOrReadOnly
+from .models import Cart, Item, Qna,Order,RefundRequest, Review, UserLogin
+from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer, ReviewSerializer
 from .models import Cart, Category, Item, Qna,Order,RefundRequest, UserLogin, Order
 from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer ,CategorySerializer
 from base.models import Example
@@ -16,6 +20,7 @@ from django.shortcuts import render
 from .serializers import RefundRequestSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 @api_view(['GET','POST']) #나열할 상품 전체 가져오기
 def base_list(request, format=None):
@@ -145,6 +150,34 @@ class CartDelete(generics.RetrieveDestroyAPIView):
 
     def get_queryset(self):
         return Cart.objects.filter(user=self.request.user)
+
+#(로그인 안해도됨) 제품에 대한 리뷰들 조회
+class ItemReviewList(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        item_id = self.kwargs['item_id']
+        return Review.objects.filter(item_id=item_id)
+
+#(로그인 후) 리뷰 작성
+class ReviewCreate(generics.ListCreateAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        item_id = self.kwargs['item_id']
+        return Review.objects.filter(item_id=item_id)
+    
+    def perform_create(self, serializer):
+        item_id = self.kwargs['item_id']
+        serializer.save(user=self.request.user, item_id=item_id)
+    
+#(본인이 작성한 리뷰에 대해) 리뷰 수정, 삭제 
+class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly] #권한 허용에 대해 정의
 
     
 @api_view(['GET'])
