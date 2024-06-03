@@ -65,9 +65,9 @@ class UserLogin(AbstractBaseUser):
     
 class Review(models.Model):
     item = models.ForeignKey('Item', on_delete=models.CASCADE)
-    user = models.CharField(max_length=255)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    content = models.CharField(max_length=255)
+    content = models.TextField()
     star = models.IntegerField()
 
 
