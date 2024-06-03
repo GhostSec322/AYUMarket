@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Cart, Category, Item, Qna,Order,RefundRequest, UserLogin, Order
-from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer
+from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer ,CategorySerializer
 from base.models import Example
 from base.serializers import ExampleSerializer
 import os
