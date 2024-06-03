@@ -3,8 +3,8 @@ from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Cart, Item, Qna,Order,RefundRequest, UserLogin
-from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer
+from .models import Cart, Item, Qna,Order,RefundRequest, UserLogin,Category
+from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer,CategorySerializer
 from base.models import Example
 from base.serializers import ExampleSerializer
 import os
@@ -28,6 +28,9 @@ def base_list(request, format=None):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class CategoryList(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 @api_view(['GET'])  #서버내 저장된 이미지 가져오기
 def get_image(request, filename):
@@ -193,3 +196,6 @@ class RefundRequestListCreateAPI(generics.ListCreateAPIView):
         # 생성된 환불 요청 데이터와 함께 승인 여부를 반환
         approved = serializer.validated_data.get('approved')
         return Response({'refund_request': serializer.data, 'approved': approved}, status=status.HTTP_201_CREATED)
+class ProductListCreate(generics.ListCreateAPIView):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer

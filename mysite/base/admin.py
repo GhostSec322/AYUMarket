@@ -7,6 +7,7 @@ admin.site.register(Qna)
 admin.site.register(Item)
 admin.site.register(Category)
 admin.site.register(Cart)
+admin.site.register(RefundRequest)
 # admin.site.register(Order)
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):

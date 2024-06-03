@@ -134,9 +134,9 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields= '__all__'
         '''
 class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        models= Category
-        fields= '__all__'
+       class Meta:
+        model = Category
+        fields = '__all__'
 #class Cart(serializers.ModelSerializer):
 #    class Meta:
 #        models=Cart
