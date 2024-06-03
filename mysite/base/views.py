@@ -3,14 +3,16 @@ from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Cart, Item, Qna,Order,RefundRequest, UserLogin,Category
-from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer,CategorySerializer
+from .models import Cart, Category, Item, Qna,Order,RefundRequest, UserLogin, Order
+from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer
 from base.models import Example
 from base.serializers import ExampleSerializer
 import os
 from django.utils import timezone
+from django.http import JsonResponse
 import datetime
-
+from django.db.models import Sum
+from django.shortcuts import render
 from .serializers import RefundRequestSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -168,6 +170,85 @@ def qna_list_by_item(request, item_id):
     serializer = QnaSerializer(qnas, many=True)
     return Response(serializer.data)
 
+#배송완료 상품의 전체 가격 합산 api
+class MonthlyCompletedOrdersTotalPriceAPI(APIView):
+    def get(self, request, *args, **kwargs):
+        today = timezone.now()
+        one_month_ago = today - datetime.timedelta(days=30)
+        completed_orders = Order.objects.filter(state='배송완료', created_at__gte=one_month_ago)
+        total_price = completed_orders.aggregate(Sum('price'))['price__sum'] or 0
+        return Response({'total_price': total_price})
+
+def show_total_price(request):
+    return render(request, 'total_price.html')
+
+#filter로 category별 배송완료된 상품들의 가격을 합산하는 코드
+def category_totals(request):
+    categories = Category.objects.all()
+    category_totals = []
+    for category in categories:
+        total_price = Order.objects.filter(item__category=category, state='배송완료').aggregate(Sum('price'))['price__sum'] or 0
+        category_totals.append({'category': category.name, 'total': total_price})
+    return JsonResponse(category_totals, safe=False)
+
+#3주 전까지의 각 주차 합산 코드
+def get_weekly_sales_data():
+    today = timezone.now()
+    weeks_ago_3 = today - datetime.timedelta(weeks=3)
+    weeks_ago_2 = today - datetime.timedelta(weeks=2)
+    weeks_ago_1 = today - datetime.timedelta(weeks=1)
+
+    # 각 주별로 Order 데이터 가져오기
+    sales_data = {
+        '3_weeks_ago': Order.objects.filter(created_at__gte=weeks_ago_3, created_at__lt=weeks_ago_2, state='배송완료'),
+        '2_weeks_ago': Order.objects.filter(created_at__gte=weeks_ago_2, created_at__lt=weeks_ago_1, state='배송완료'),
+        '1_week_ago': Order.objects.filter(created_at__gte=weeks_ago_1, created_at__lt=today, state='배송완료'),
+        'today': Order.objects.filter(created_at__gte=today - datetime.timedelta(days=1), state='배송완료')
+    }
+
+    # 각 주별 매출 합산
+    weekly_sales = {
+        '3_weeks_ago': sales_data['3_weeks_ago'].aggregate(total_price=Sum('price'))['total_price'] or 0,
+        '2_weeks_ago': sales_data['2_weeks_ago'].aggregate(total_price=Sum('price'))['total_price'] or 0,
+        '1_week_ago': sales_data['1_week_ago'].aggregate(total_price=Sum('price'))['total_price'] or 0,
+        'today': sales_data['today'].aggregate(total_price=Sum('price'))['total_price'] or 0,
+    }
+
+    return weekly_sales
+
+def chart_view(request):
+    weekly_sales = get_weekly_sales_data()
+    return JsonResponse({'weekly_sales': weekly_sales})
+
+
+#카테고리별 합산 데이터
+def get_weekly_category_sales_data():
+    today = timezone.now()
+    weeks_ago_3 = today - datetime.timedelta(weeks=3)
+    weeks_ago_2 = today - datetime.timedelta(weeks=2)
+    weeks_ago_1 = today - datetime.timedelta(weeks=1)
+
+    sales_data = {
+        '3_weeks_ago': Order.objects.filter(created_at__gte=weeks_ago_3, created_at__lt=weeks_ago_2, state='배송완료'),
+        '2_weeks_ago': Order.objects.filter(created_at__gte=weeks_ago_2, created_at__lt=weeks_ago_1, state='배송완료'),
+        '1_week_ago': Order.objects.filter(created_at__gte=weeks_ago_1, created_at__lt=today, state='배송완료'),
+        'today': Order.objects.filter(created_at__gte=today - datetime.timedelta(days=1), state='배송완료')
+    }
+
+    categories = Category.objects.all()
+    weekly_category_sales = {category.name: {} for category in categories}
+
+    for category in categories:
+        weekly_category_sales[category.name]['3_weeks_ago'] = sales_data['3_weeks_ago'].filter(item__category=category).aggregate(total_price=Sum('price'))['total_price'] or 0
+        weekly_category_sales[category.name]['2_weeks_ago'] = sales_data['2_weeks_ago'].filter(item__category=category).aggregate(total_price=Sum('price'))['total_price'] or 0
+        weekly_category_sales[category.name]['1_week_ago'] = sales_data['1_week_ago'].filter(item__category=category).aggregate(total_price=Sum('price'))['total_price'] or 0
+        weekly_category_sales[category.name]['today'] = sales_data['today'].filter(item__category=category).aggregate(total_price=Sum('price'))['total_price'] or 0
+
+    return weekly_category_sales
+
+def category_chart_view(request):
+    weekly_category_sales = get_weekly_category_sales_data()
+    return JsonResponse({'weekly_category_sales': weekly_category_sales})
 
 class MonthlyCompletedOrdersPriceAPI(generics.ListAPIView):
     serializer_class = OrderSerializer

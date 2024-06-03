@@ -19,6 +19,15 @@ urlpatterns = [
     path('cart/', CartList.as_view()),
     path('cartget/', CartGet.as_view()),
     path('cart/<int:pk>/', CartDelete.as_view()),
+    #전체 가격 합산url
+    path('api/monthly-completed-orders-total/', MonthlyCompletedOrdersTotalPriceAPI.as_view(), name='monthly-completed-orders-total'),
+    path('total-price/', show_total_price, name='show-total-price'),
+    #카테고리별 합산url
+    path('category_totals/', category_totals, name='category_totals'),
+    #전체 합산 그래프
+    path('chart-data/', chart_view, name='chart-data'),
+    #카테고리별 합산 그래프
+    path('category-chart-data/', category_chart_view, name='category-chart-data'),
     path('itemcreate/',ProductListCreate.as_view(),name='product-list-create'),
     path('categories/', CategoryList.as_view(), name='category-list'),
 ]
