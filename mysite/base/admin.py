@@ -4,11 +4,14 @@ from .models import *
 admin.site.register(UserLogin)
 admin.site.register(Review)
 admin.site.register(Qna)
-admin.site.register(Item)
+@admin.register(Item)
+class ItemAdmin(admin.ModelAdmin):
+    list_display = ('title', 'price', 'stock', 'category')
+    search_fields = ('title', 'content')
 admin.site.register(Category)
 admin.site.register(Cart)
 # admin.site.register(Order)
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('title', 'price', 'count', 'username')
+    list_display = ('title', 'price', 'count', 'username', 'created_at')
     search_fields = ('title', 'username')
