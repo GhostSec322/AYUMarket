@@ -31,5 +31,8 @@ urlpatterns = [
     path('chart-data/', chart_view, name='chart-data'),
     #카테고리별 합산 그래프
     path('category-chart-data/', category_chart_view, name='category-chart-data'),
+    path('itemcreate/',ProductListCreate.as_view(),name='product-list-create'),
+    path('categories/', CategoryList.as_view(), name='category-list'),
 ]
+
 
