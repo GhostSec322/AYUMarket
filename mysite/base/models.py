@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, UserManager,BaseUserManager
 from django.conf import settings
+from django.utils import timezone
+
 
 # Create your models here.
 class Example(models.Model):
@@ -77,6 +79,10 @@ class Item(models.Model):
     stock = models.IntegerField()## 재고량
     category = models.ForeignKey('Category', on_delete=models.CASCADE) ##카테고리
 
+    # def price_display(self):
+    #     return f"{self.price} 원"
+    # price_display.short_description = 'price'
+
     def __str__(self):
         return self.title
 
@@ -106,7 +112,7 @@ class Order(models.Model):
     price = models.IntegerField(editable= False)
     count = models.IntegerField()
     state = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)#auto_now_add=True
 
     def get_item_title(self):
         return self.item.title
