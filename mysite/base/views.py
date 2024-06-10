@@ -125,9 +125,11 @@ def approve_order(request, pk):
 @api_view(['POST'])
 def reject_order(request, order_id):
     if request.method == 'POST':
+        reason = request.data.get('reason', '')
         try:
             order = Order.objects.get(pk=order_id)
             order.approve = False
+            order.state = f"배송거절: {reason}"
             order.save()
             return Response({"message": f"주문 {order_id}이(가) 거절되었습니다."}, status=status.HTTP_200_OK)
         except Order.DoesNotExist:
