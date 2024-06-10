@@ -122,18 +122,7 @@ def approve_order(request, pk):
     item.save()
 
     return Response({'message': '승인되었습니다.'}, status=status.HTTP_200_OK)
-@api_view(['POST'])
-def reject_order(request, order_id):
-    if request.method == 'POST':
-        reason = request.data.get('reason', '')
-        try:
-            order = Order.objects.get(pk=order_id)
-            order.approve = False
-            order.state = f"배송거절: {reason}"
-            order.save()
-            return Response({"message": f"주문 {order_id}이(가) 거절되었습니다."}, status=status.HTTP_200_OK)
-        except Order.DoesNotExist:
-            return Response({"message": f"주문 {order_id}을(를) 찾을 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+
 
 ''' #회원가입 데코레이터 버전
 @api_view(['POST'])
@@ -341,18 +330,19 @@ class MonthlyCompletedOrdersPriceAPI(generics.ListAPIView):
         return completed_orders
     
 class RefundRequestListCreateAPI(generics.ListCreateAPIView):
-    queryset = RefundRequest.objects.all()
     serializer_class = RefundRequestSerializer
 
+    def get_queryset(self):
+        return RefundRequest.objects.filter(approved=False, state__isnull=True)
+
     def create(self, request, *args, **kwargs):
-        # 요청된 데이터로 새로운 환불 요청 생성
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         
-        # 생성된 환불 요청 데이터와 함께 승인 여부를 반환
         approved = serializer.validated_data.get('approved')
         return Response({'refund_request': serializer.data, 'approved': approved}, status=status.HTTP_201_CREATED)
+    
 class ProductListCreate(generics.ListCreateAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer

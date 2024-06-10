@@ -128,5 +128,5 @@ class RefundRequest(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE)
     reason = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    state = models.CharField(null=True, blank=True, max_length=240)
     approved = models.BooleanField(default=False)  # 승인 여부
-    

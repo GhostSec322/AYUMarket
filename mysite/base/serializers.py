@@ -147,9 +147,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class RefundRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = RefundRequest
-        fields = ['order', 'reason', 'created_at', 'approved']
-
-
+        fields = '__all__'
 class ReviewSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
     item = serializers.ReadOnlyField(source='item.id')
