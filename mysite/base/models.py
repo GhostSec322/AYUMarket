@@ -107,14 +107,27 @@ class Cart(models.Model):
 
 class Order(models.Model):
     item = models.ForeignKey('Item', on_delete=models.CASCADE)
-    username = models.CharField(max_length=255)
+    username = models.CharField(max_length=255) #주문자 명
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1) #로그인 검증
     title = models.CharField(max_length=255, editable = False)
     price = models.IntegerField(editable= False)
     count = models.IntegerField()
     state = models.CharField(max_length=255)
+    merchant_uid = models.CharField(max_length=255, unique=True,default='1234')
+    address = models.CharField(max_length=255, default='No address provided')
     created_at = models.DateTimeField(default=timezone.now)#auto_now_add=True
     approve= models.BooleanField(default=False)
-    def get_item_title(self):
+    def save(self, *args, **kwargs):
+        if self.price <= 0:
+            raise ValueError('가격은 양수여야 합니다.')
+        
+        if self.count <= 0:
+            raise ValueError('수량은 양수여야 합니다.')
+
+        super().save(*args, **kwargs)
+
+'''
+def get_item_title(self):
         return self.item.title
 
     def save(self, *args, **kwargs):
@@ -123,6 +136,8 @@ class Order(models.Model):
         self.item.save()
         self.price = self.item.price * self.count
         super(Order, self).save(*args, **kwargs)
+'''
+    
 
 class RefundRequest(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE)

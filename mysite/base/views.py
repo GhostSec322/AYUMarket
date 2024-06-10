@@ -210,6 +210,15 @@ class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly] #권한 허용에 대해 정의
 
+#특정 제품의 정보를 get 해오기
+class ItemDetailView(APIView):
+    def get(self, request, id):
+        try:
+            item = Item.objects.get(id=id)
+            serializer = ItemSerializer(item)
+            return Response(serializer.data)
+        except Item.DoesNotExist:
+            return Response({"message": "해당 아이템이 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
     
 @api_view(['GET'])
 def qna_list(request):
