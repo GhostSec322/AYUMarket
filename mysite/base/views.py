@@ -91,8 +91,48 @@ class QnaList(APIView):
 class Register(generics.CreateAPIView):
     queryset = UserLogin.objects.all()
     serializer_class = RegisterSerializer
-
+@api_view(['GET', 'POST'])
+def order_list(request):
+    if request.method == 'GET':
+        orders = Order.objects.filter(approve=False)  # 승인되지 않은 주문만 반환
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = OrderSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['POST'])
+def approve_order(request, pk):
+    try:
+        order = Order.objects.get(pk=pk)
+    except Order.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
     
+    # Check if there's enough stock
+    item = order.item
+    if item.stock < order.count:
+        return Response({'message': 'Not enough stock'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Update the approve status and stock
+    order.approve = True
+    order.save()
+    item.stock -= order.count
+    item.save()
+
+    return Response({'message': '승인되었습니다.'}, status=status.HTTP_200_OK)
+@api_view(['POST'])
+def reject_order(request, order_id):
+    if request.method == 'POST':
+        try:
+            order = Order.objects.get(pk=order_id)
+            order.approve = False
+            order.save()
+            return Response({"message": f"주문 {order_id}이(가) 거절되었습니다."}, status=status.HTTP_200_OK)
+        except Order.DoesNotExist:
+            return Response({"message": f"주문 {order_id}을(를) 찾을 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+
 ''' #회원가입 데코레이터 버전
 @api_view(['POST'])
 def register(request):
@@ -191,9 +231,10 @@ class OrderListByUsername(generics.ListAPIView):
     def get_queryset(self):
         username = self.request.query_params.get('username')
         if username is not None:
-            return Order.objects.filter(username=username)
-        return Order.objects.all()
-    
+            return Order.objects.filter(username=username, approve=False)
+        return Order.objects.filter(approve=False)
+
+
 @api_view(['GET'])
 def qna_list_by_item(request, item_id):
     qnas = Qna.objects.filter(item__id=item_id)

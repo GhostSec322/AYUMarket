@@ -75,7 +75,7 @@ class Item(models.Model):
     title = models.CharField(max_length=255) ## 상품제목
     content = models.CharField(max_length=255) ## 상세내용
     price = models.IntegerField() ## 가격
-    photo = models.CharField(max_length=255)  #상품이미지
+    photo = models.ImageField(upload_to='photos/')
     stock = models.IntegerField()## 재고량
     category = models.ForeignKey('Category', on_delete=models.CASCADE) ##카테고리
 
@@ -113,7 +113,7 @@ class Order(models.Model):
     count = models.IntegerField()
     state = models.CharField(max_length=255)
     created_at = models.DateTimeField(default=timezone.now)#auto_now_add=True
-
+    approve= models.BooleanField(default=False)
     def get_item_title(self):
         return self.item.title
 
