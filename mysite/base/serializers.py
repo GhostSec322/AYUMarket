@@ -14,13 +14,16 @@ class ExampleSerializer(serializers.ModelSerializer):
 
 
 class QnaSerializer(serializers.ModelSerializer):
+    item_title = serializers.CharField(source='item.title', read_only=True)
     class Meta:
         model = Qna
-        fields = '__all__'
+        fields = ['id', 'question', 'answer', 'item', 'item_title']
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = '__all__'
+
+
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -145,9 +148,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class RefundRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = RefundRequest
-        fields = ['order', 'reason', 'created_at', 'approved']
-
-
+        fields = '__all__'
 class ReviewSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
     item = serializers.ReadOnlyField(source='item.id')
