@@ -97,10 +97,11 @@ class CarListtSerializer(serializers.ModelSerializer):
 class CartSerializer(serializers.ModelSerializer):
     item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all(), write_only=True)
     user = serializers.ReadOnlyField(source='user.username')
+    count = serializers.IntegerField(required=True)
 
     class Meta:
         model = Cart
-        fields = ['id', 'item', 'user']
+        fields = ['id', 'item', 'user','count']
         read_only_fields=['user']
 
     def create(self, validated_data):
@@ -109,7 +110,7 @@ class CartSerializer(serializers.ModelSerializer):
         count = validated_data.get('count', 1)
 
 
-        cart = Cart.objects.update_or_create(
+        cart, created = Cart.objects.update_or_create(  #메소드가 값을 주는 변수를 잘 저장하자
             item=item,
             user= user,
             defaults={'count': count}
@@ -117,7 +118,7 @@ class CartSerializer(serializers.ModelSerializer):
         return cart
     
 class CartGetSerializer(serializers.ModelSerializer):
-    item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all(), write_only=True)
+    item = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all())
     user = serializers.ReadOnlyField(source='user.username')
 
     class Meta:
@@ -150,6 +151,7 @@ class RefundRequestSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
     item = serializers.ReadOnlyField(source='item.id')
+    
     
     class Meta:
         model = Review
