@@ -121,6 +121,11 @@ REST_FRAMEWORK ={
     ]
 }
 
+IAMPORT = {
+    'IMP_KEY': '1600788307288333',
+    'IMP_SECRET': 'GG0Cv96i5kMoCBJCcIT45ReV1GgNU7RNjC6ARNH8ljJMU3bCCAEzBhaVGEtosdH6QRQ3YVbCeSsNiaTy',
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

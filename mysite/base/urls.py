@@ -37,6 +37,8 @@ urlpatterns = [
     path('category-chart-data/', category_chart_view, name='category-chart-data'),
     path('itemcreate/',ProductListCreate.as_view(),name='product-list-create'),
     path('categories/', CategoryList.as_view(), name='category-list'),
+    #결제관련 
+    path('payment/', payComplete.as_view())
 ]
 
 
