@@ -9,11 +9,9 @@ from django.conf import settings
 
 from .permissions import IsOwnerOrReadOnly
 from .models import Cart, Item, Qna,Order,RefundRequest, Review, UserLogin
-from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer, ReviewSerializer
+from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, OrderViewSerializer, QnaSerializer,OrderSerializer, RegisterSerializer, ReviewSerializer
 from .models import Cart, Category, Item, Qna,Order,RefundRequest, UserLogin, Order
 from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer ,CategorySerializer
-from base.models import Example
-from base.serializers import ExampleSerializer
 import os
 from django.utils import timezone
 from django.http import JsonResponse
@@ -228,6 +226,7 @@ def qna_list(request):
     qna = Qna.objects.all()
     serializer = QnaSerializer(qna, many=True)
     return Response(serializer.data)
+
 class OrderListByUsername(generics.ListAPIView):
     serializer_class = OrderSerializer
 
@@ -425,3 +424,11 @@ class payComplete(APIView):
         if response.status_code == 200:
             return response.json()['response']
         return None
+    
+#회원별 주문리스트 조회
+class UserOrderList(generics.ListAPIView):
+    serializer_class = OrderViewSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
