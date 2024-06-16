@@ -121,6 +121,18 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ['id','title','content', 'price', 'photo', 'stock', 'category']
+    
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+class OrderViewSerializer(serializers.ModelSerializer):
+    item=ItemSerializer()
+    class Meta:
+        model = Order
+        fields = '__all__'
 
 class CarListtSerializer(serializers.ModelSerializer):
     class Meta:
