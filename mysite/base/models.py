@@ -109,8 +109,8 @@ class Order(models.Model):
     item = models.ForeignKey('Item', on_delete=models.CASCADE)
     username = models.CharField(max_length=255) #주문자 명
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=1) #로그인 검증
-    title = models.CharField(max_length=255, editable = False)
-    price = models.IntegerField(editable= False)
+    title = models.CharField(max_length=255)
+    price = models.IntegerField()
     count = models.IntegerField()
     state = models.CharField(max_length=255)
     merchant_uid = models.CharField(max_length=255, unique=True,default='1234')

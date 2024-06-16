@@ -1,16 +1,17 @@
+import requests
 from django.http import HttpResponse
 from rest_framework import status, generics, permissions
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from django.conf import settings
+
 from .permissions import IsOwnerOrReadOnly
 from .models import Cart, Item, Qna,Order,RefundRequest, Review, UserLogin
-from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer, ReviewSerializer
+from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, OrderViewSerializer, QnaSerializer,OrderSerializer, RegisterSerializer, ReviewSerializer
 from .models import Cart, Category, Item, Qna,Order,RefundRequest, UserLogin, Order
 from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer ,CategorySerializer
-from base.models import Example
-from base.serializers import ExampleSerializer
 import os
 from django.utils import timezone
 from django.http import JsonResponse
@@ -225,6 +226,7 @@ def qna_list(request):
     qna = Qna.objects.all()
     serializer = QnaSerializer(qna, many=True)
     return Response(serializer.data)
+
 class OrderListByUsername(generics.ListAPIView):
     serializer_class = OrderSerializer
 
@@ -354,3 +356,78 @@ class RefundRequestListCreateAPI(generics.ListCreateAPIView):
 class ProductListCreate(generics.ListCreateAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+
+class payComplete(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        imp_uid = request.data.get('imp_uid')
+        merchant_uid = request.data.get('merchant_uid')
+        product_name = request.data.get('product_name')
+        total_amount = request.data.get('total_amount')
+        buyer_name = request.data.get('buyer_name')
+        buyer_phone = request.data.get('buyer_phone')
+        buyer_address = request.data.get('buyer_address')
+        buyer_email = request.data.get('buyer_email')
+        product_quantity = request.data.get('product_quantity')
+
+        access_token = self.get_access_token()
+        if not access_token:
+            return Response({'포트원 인증에 실패했습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        pay_data = self.get_pay_data(access_token, imp_uid)
+        if not pay_data:
+            return Response({'결제 정보를 가져오는데 실패했습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if pay_data['amount'] != total_amount:
+            return Response({'금액이 일치하지 않습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        item = Item.objects.get(title=product_name)
+
+        order_data = {
+            'item': item.id,
+            'username': buyer_name,
+            'user': request.user.id,
+            'title': product_name,
+            'price': total_amount,
+            'count': product_quantity,
+            'state': '주문완료',
+            'merchant_uid':merchant_uid,
+            'address':buyer_address,
+            'approve': False,
+        }
+        serializer = OrderSerializer(data = order_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message':'결제가 완료되었습니다.', 'data':serializer.data}, status=status.HTTP_200_OK)
+        return Response({'message':'저장에 실패하였습니다.', 'error':serializer.errors },status=status.HTTP_400_BAD_REQUEST)
+    
+    def get_access_token(self):
+        url = 'https://api.iamport.kr/users/getToken'
+        data = {
+            'imp_key': settings.IAMPORT['IMP_KEY'],
+            'imp_secret': settings.IAMPORT['IMP_SECRET']
+        }
+
+        response = requests.post(url, data=data)
+        if response.status_code == 200:
+            return response.json()['response']['access_token']
+        return None
+
+    def get_pay_data(self, access_token, imp_uid):
+        url = f"https://api.iamport.kr/payments/{imp_uid}"
+        headers = {
+            'Authorization': access_token
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.json()['response']
+        return None
+    
+#회원별 주문리스트 조회
+class UserOrderList(generics.ListAPIView):
+    serializer_class = OrderViewSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)

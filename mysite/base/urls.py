@@ -8,6 +8,8 @@ urlpatterns = [
     # path('detail/<int:pk>/', views.product_detail),
     path('detail/', views.product_detail),
     path('qna/',views.qna_list, name='qna-list'),
+    #item별 qna 조회 이거 누가 데코레이터 작성함?
+    path('qnalist/<int:item_id>/', views.qna_list_by_item),
     
     path('orders/', OrderListByUsername.as_view(), name='order-list-by-username'),
     path('orders/approve/<int:pk>/', views.approve_order),
@@ -37,4 +39,10 @@ urlpatterns = [
     path('category-chart-data/', category_chart_view, name='category-chart-data'),
     path('itemcreate/',ProductListCreate.as_view(),name='product-list-create'),
     path('categories/', CategoryList.as_view(), name='category-list'),
+    #결제관련 
+    path('payment/', payComplete.as_view()),
+    #주문내역
+    path('myorders/',UserOrderList.as_view())
 ]
+
+
