@@ -91,8 +91,39 @@ class QnaList(APIView):
 class Register(generics.CreateAPIView):
     queryset = UserLogin.objects.all()
     serializer_class = RegisterSerializer
-
+@api_view(['GET', 'POST'])
+def order_list(request):
+    if request.method == 'GET':
+        orders = Order.objects.filter(approve=False)  # 승인되지 않은 주문만 반환
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = OrderSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['POST'])
+def approve_order(request, pk):
+    try:
+        order = Order.objects.get(pk=pk)
+    except Order.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
     
+    # Check if there's enough stock
+    item = order.item
+    if item.stock < order.count:
+        return Response({'message': 'Not enough stock'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Update the approve status and stock
+    order.approve = True
+    order.save()
+    item.stock -= order.count
+    item.save()
+
+    return Response({'message': '승인되었습니다.'}, status=status.HTTP_200_OK)
+
+
 ''' #회원가입 데코레이터 버전
 @api_view(['POST'])
 def register(request):
@@ -179,6 +210,15 @@ class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly] #권한 허용에 대해 정의
 
+#특정 제품의 정보를 get 해오기
+class ItemDetailView(APIView):
+    def get(self, request, id):
+        try:
+            item = Item.objects.get(id=id)
+            serializer = ItemSerializer(item)
+            return Response(serializer.data)
+        except Item.DoesNotExist:
+            return Response({"message": "해당 아이템이 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
     
 @api_view(['GET'])
 def qna_list(request):
@@ -191,9 +231,10 @@ class OrderListByUsername(generics.ListAPIView):
     def get_queryset(self):
         username = self.request.query_params.get('username')
         if username is not None:
-            return Order.objects.filter(username=username)
-        return Order.objects.all()
-    
+            return Order.objects.filter(username=username, approve=False)
+        return Order.objects.filter(approve=False)
+
+
 @api_view(['GET'])
 def qna_list_by_item(request, item_id):
     qnas = Qna.objects.filter(item__id=item_id)
@@ -297,18 +338,19 @@ class MonthlyCompletedOrdersPriceAPI(generics.ListAPIView):
         return completed_orders
     
 class RefundRequestListCreateAPI(generics.ListCreateAPIView):
-    queryset = RefundRequest.objects.all()
     serializer_class = RefundRequestSerializer
 
+    def get_queryset(self):
+        return RefundRequest.objects.filter(approved=False, state__isnull=True)
+
     def create(self, request, *args, **kwargs):
-        # 요청된 데이터로 새로운 환불 요청 생성
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         
-        # 생성된 환불 요청 데이터와 함께 승인 여부를 반환
         approved = serializer.validated_data.get('approved')
         return Response({'refund_request': serializer.data, 'approved': approved}, status=status.HTTP_201_CREATED)
+    
 class ProductListCreate(generics.ListCreateAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
