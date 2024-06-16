@@ -39,6 +39,7 @@ urlpatterns = [
     path('category-chart-data/', category_chart_view, name='category-chart-data'),
     path('itemcreate/',ProductListCreate.as_view(),name='product-list-create'),
     path('categories/', CategoryList.as_view(), name='category-list'),
+<<<<<<< HEAD
     #결제관련 
     path('payment/', payComplete.as_view()),
     #주문내역
@@ -46,3 +47,6 @@ urlpatterns = [
 ]
 
 
+=======
+]
+>>>>>>> 819988c36875fff43d36cb3d39f27462ded26d55

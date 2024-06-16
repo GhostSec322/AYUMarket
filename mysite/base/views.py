@@ -257,7 +257,6 @@ class MonthlyCompletedOrdersTotalPriceAPI(APIView):
 
 def show_total_price(request):
     return render(request, 'total_price.html')
-
 #filter로 category별 배송완료된 상품들의 가격을 합산하는 코드
 def category_totals(request):
     categories = Category.objects.all()
