@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Total Price</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+    <h1>전체 합계</h1>
+    <p id="total-price" style="font-size: 20px;">Loading...</p>
+    <h1>각 카테고리별 합계</h1>
+    <ul id="category-totals-list" style="font-size: 20px;"></ul>
+    <h1> 주간 매출 차트</h1>
+    <div id="curve_chart" style="width: 900px; height: 500px">Loading...</div>
+    <h1> 주간 카테고리별 차트</h1>
+    <div id="category_chart" style="width: 900px; height: 500px;">Loading...</div>
+    
+    <script type="text/javascript">
+        //주간 총 매출
+        function drawChart(weeklySales) {
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(function() {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Week');
+                data.addColumn('number', 'Sales');
+
+                data.addRows([
+                    ['3 weeks ago', weeklySales['3_weeks_ago']],
+                    ['2 weeks ago', weeklySales['2_weeks_ago']],
+                    ['1 week ago', weeklySales['1_week_ago']],
+                    ['Today', weeklySales['today']]
+                ]);
+
+                var options = {
+                    title: 'Weekly Sales',
+                    legend: { position: 'bottom' }
+                };
+
+                var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+                chart.draw(data, options);
+            });
+        }
+        
+        //카테고리별 주간 매출
+        function drawCategoryChart(weeklyCategorySales) {
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(function() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Week');
+
+            var categories = Object.keys(weeklyCategorySales);
+            console.log('Categories:', categories);
+            categories.forEach(function(category) {
+                data.addColumn('number', category);
+            });
+
+            var rows = [
+                ['3 weeks ago'],
+                ['2 weeks ago'],
+                ['1 week ago'],
+                ['Today']
+            ];
+
+            rows.forEach(function(row, index) {
+                var week;
+                switch (index) {
+                    case 0:
+                        week = '3_weeks_ago';
+                        break;
+                    case 1:
+                        week = '2_weeks_ago';
+                        break;
+                    case 2:
+                        week = '1_week_ago';
+                        break;
+                    case 3:
+                        week = 'today';
+                        break;
+                }
+                categories.forEach(function(category) {
+                    console.log('Category:', category, 'Week:', week, 'Value:', weeklyCategorySales[category][week]);
+                    row.push(weeklyCategorySales[category][week]);
+                });
+            });
+
+            console.log('Rows:', rows);
+            data.addRows(rows);
+
+            var options = {
+                title: 'Weekly Category Sales',
+                legend: { position: 'bottom' }
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById('category_chart'));
+            chart.draw(data, options);
+        });
+    }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Order의 전체 합산
+            fetch('http://127.0.0.1:8000/api/monthly-completed-orders-total/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Total Price Data:', data);
+                    const totalPrice = data.total_price;
+                    document.getElementById('total-price').textContent = `${totalPrice} 원`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('total-price').textContent = 'Error loading total price.';
+                });
+
+            // 각 카테고리별 상품들의 합산
+            fetch('http://127.0.0.1:8000/category_totals/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Category Totals Data:', data);
+                    // JSON 데이터를 HTML에 추가
+                    const list = document.getElementById('category-totals-list');
+                    data.forEach(item => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${item.category} 합계: ${item.total} 원`;
+                        list.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+
+            // 주간 매출 차트
+            fetch('http://127.0.0.1:8000/chart-data/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Weekly Sales Data:', data);
+                    drawChart(data.weekly_sales);
+                })
+                .catch(error => console.error('Error:', error));
+            
+            //카테고리별 주간 매출 차트
+            fetch('http://127.0.0.1:8000/category-chart-data/')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Weekly Category Sales Data:', data);
+                drawCategoryChart(data.weekly_category_sales);
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
