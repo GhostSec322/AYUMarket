@@ -8,20 +8,53 @@ from .permissions import IsOwnerOrReadOnly
 from .models import Cart, Item, Qna,Order,RefundRequest, Review, UserLogin
 from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer, ReviewSerializer
 from .models import Cart, Category, Item, Qna,Order,RefundRequest, UserLogin, Order
-from .serializers import CartGetSerializer, CartSerializer, ItemSerializer, LoginSerializer, QnaSerializer,OrderSerializer, RegisterSerializer ,CategorySerializer
-from base.models import Example
-from base.serializers import ExampleSerializer
+from .serializers import *
+
 import os
 from django.utils import timezone
 from django.http import JsonResponse
 import datetime
 from django.db.models import Sum
 from django.shortcuts import render
-from .serializers import RefundRequestSerializer
+from .serializers import *
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+class SellerLoginView(APIView):
+    serializer_class = SellerLoginSerializer
 
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            password = serializer.validated_data['password']
+            
+            # 사용자 인증
+            user = authenticate(email=email, password=password)
+            
+            if user:
+                # 토큰 생성 또는 기존 토큰 가져오기
+                token, created = Token.objects.get_or_create(user=user)
+                
+                # 토큰을 사용자 모델에 저장
+                user.token = token.key
+                user.save()
+                
+                return Response({'token': token.key}, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': '인증 실패'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class RegisterSellerView(APIView):
+
+    def post(self, request):
+        serializer = SellerSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Seller registered successfully."}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 @api_view(['GET','POST']) #나열할 상품 전체 가져오기
 def base_list(request, format=None):
     if request.method == 'GET':
@@ -39,6 +72,14 @@ class CategoryList(generics.ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
+class QnaCreateView(APIView):
+    def post(self, request):
+        serializer = QnaCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()  # Serializer가 유효할 경우 DB에 저장
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 @api_view(['GET'])  #서버내 저장된 이미지 가져오기
 def get_image(request, filename):
     current_directory=os.getcwd() #현재 디렉토리 추출
@@ -86,6 +127,22 @@ class QnaList(APIView):
         qna = Qna.objects.all()
         serializer = QnaSerializer(qna, many=True)
         return Response(serializer.data)
+@api_view(['POST'])
+def add_answer(request, qna_id):
+    try:
+        qna = Qna.objects.get(id=qna_id)
+    except Qna.DoesNotExist:
+        return Response({'error': 'QnA not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    answer = request.data.get('answer')
+    if not answer:
+        return Response({'error': 'Answer is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    qna.answer = answer
+    qna.save()
+    
+    serializer = QnaSerializer(qna)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 #회원가입 클래스 기반 버전   
 class Register(generics.CreateAPIView):
@@ -122,7 +179,22 @@ def approve_order(request, pk):
     item.save()
 
     return Response({'message': '승인되었습니다.'}, status=status.HTTP_200_OK)
+@api_view(['POST'])
+def reject_order(request, pk):
+    try:
+        order = Order.objects.get(pk=pk)
+    except Order.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
+    # Get the rejection reason from the request data
+    reason = request.data.get('reason', '')
+
+    # Update the approve status and save the reason for rejection in the state field
+    order.approve = False
+    order.state = f"거절 사유: {reason}"
+    order.save()
+
+    return Response({'message': '거절되었습니다.', 'reason': reason}, status=status.HTTP_200_OK)
 
 ''' #회원가입 데코레이터 버전
 @api_view(['POST'])
@@ -355,3 +427,4 @@ class RefundRequestListCreateAPI(generics.ListCreateAPIView):
 class ProductListCreate(generics.ListCreateAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+

@@ -1,29 +1,60 @@
 from rest_framework import serializers
-from base.models import Example
 from .models import *
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.hashers import check_password
 from rest_framework.validators import UniqueValidator
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
-
-class ExampleSerializer(serializers.ModelSerializer):
+class QnaCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Example
-        fields = ['id', 'title','content', 'price', 'photo', 'stock', 'category']
+        model = Qna
+        fields = ['question', 'item']
+class SellerLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(style={'input_type': 'password'})
 
+    def validate(self, data):
+        email = data.get('email')
+        password = data.get('password')
+
+        if email and password:
+            # 이메일로 판매자 객체 가져오기
+            seller = Seller.objects.filter(email=email).first()
+
+            if seller:
+                # 비밀번호 확인
+                if not seller.check_password(password):
+                    raise serializers.ValidationError('비밀번호가 일치하지 않습니다.')
+            else:
+                raise serializers.ValidationError('해당 이메일의 판매자가 존재하지 않습니다.')
+        else:
+            raise serializers.ValidationError('이메일과 비밀번호를 입력해주세요.')
+
+        return data
+class SellerSerializer(serializers.ModelSerializer):
+    confirm_password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = Seller
+        fields = ['name', 'email', 'password', 'confirm_password', 'phone', 'bank', 'account_number']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
+    def create(self, validated_data):
+        validated_data.pop('confirm_password', None)  # confirm_password 필드 제거
+        return Seller.objects.create_user(**validated_data)
 
 class QnaSerializer(serializers.ModelSerializer):
     item_title = serializers.CharField(source='item.title', read_only=True)
     class Meta:
         model = Qna
         fields = ['id', 'question', 'answer', 'item', 'item_title']
+
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = '__all__'
-
-
 
 
 class RegisterSerializer(serializers.ModelSerializer):
